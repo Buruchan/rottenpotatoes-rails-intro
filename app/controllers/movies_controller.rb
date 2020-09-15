@@ -14,14 +14,12 @@ class MoviesController < ApplicationController
    #@movies = Movie.all
    redirect = false
    @all_ratings = Movie.all_ratings
-   @ratings =  params[:ratings] || session[:ratings] || Hash[@all_ratings.map {|rating| [rating, rating]}]
-
-
+  
     if params[:sort_by]
       @sort_by = params[:sort_by]
       session[:sort_by] = @sort_by
     elsif session[:sort_by]
-      redirect = 1
+      redirect = true
       @sort_by = session[:sort_by]
     else
       @sort_by = nil
@@ -31,7 +29,7 @@ class MoviesController < ApplicationController
       @ratings = params[:ratings]
       session[:ratings] = @ratings
     elsif session[:ratings]
-      redirect = 1
+      redirect = true
       @ratings = session[:ratings]
     else
       @ratings = nil
@@ -39,25 +37,25 @@ class MoviesController < ApplicationController
 
     if redirect
       flash.keep
-      redirect_to movies_path :sort_by => @sort_by, :ratings => @ratings
+      redirect_to movies_path :ratings => @ratings, :sort_by => @sort_by
     end
 
   
-    #if !@ratings
-    #  @ratings = Hash.new
-    #  @all_ratings.each do |rating|
-     #   @ratings[rating] = 1
-     # end
-   # end
+    if !@ratings
+      @ratings = Hash.new
+      @all_ratings.each do |rating|
+        @ratings[rating] = 1
+      end
+    end
 
-    if @sort_by and @ratings
-      @movies = Movie.where(:rating => @ratings.keys).order(@sort_by)
-    elsif @ratings
+    if @ratings and @sort_by
+      @movies = Movie.where(:rating => @ratings.keys).order(params[:sort_by])
+    elsif @sort_by and not @ratings
+      @movies = Movie.order(params[:sort_by])
+    elsif @ratings and not @sort_by
       @movies = Movie.where(:rating => @ratings.keys)
-    elsif @sort_by
-      @movies = Movie.all.order(@sort_by)
-    else
-      @movies = Movie.all
+    elsif not @ratings and not @sort_by
+      @movie = Movie.all
     end
     
   end
