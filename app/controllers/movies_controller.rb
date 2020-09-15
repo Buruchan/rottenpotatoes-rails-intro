@@ -11,13 +11,15 @@ class MoviesController < ApplicationController
   end
 
   def index
-   redirectFlag = false
+   #@movies = Movie.all
+   redirect = false
+   @all_ratings = Movie.all_ratings
 
     if params[:sort_by]
       @sort_by = params[:sort_by]
       session[:sort_by] = @sort_by
     elsif session[:sort_by]
-      redirectFlag = 1
+      redirect = 1
       @sort_by = session[:sort_by]
     else
       @sort_by = nil
@@ -27,22 +29,18 @@ class MoviesController < ApplicationController
       @ratings = params[:ratings]
       session[:ratings] = @ratings
     elsif session[:ratings]
-      redirectFlag = 1
+      redirect = 1
       @ratings = session[:ratings]
     else
       @ratings = nil
     end
 
-    if redirectFlag
+    if redirect
       flash.keep
-
       redirect_to movies_path :sort_by => @sort_by, :ratings => @ratings
     end
 
-    @all_ratings = Movie.all_ratings
-    puts "its here"
-    puts @all_ratings
-
+  
     if !@ratings
       @ratings = Hash.new
       @all_ratings.each do |rating|
