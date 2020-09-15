@@ -14,6 +14,8 @@ class MoviesController < ApplicationController
    #@movies = Movie.all
    redirect = false
    @all_ratings = Movie.all_ratings
+   @ratings =  params[:ratings] || session[:ratings] || Hash[@all_ratings.map {|rating| [rating, rating]}]
+
 
     if params[:sort_by]
       @sort_by = params[:sort_by]
@@ -41,12 +43,12 @@ class MoviesController < ApplicationController
     end
 
   
-    if !@ratings
-      @ratings = Hash.new
-      @all_ratings.each do |rating|
-        @ratings[rating] = 1
-      end
-    end
+    #if !@ratings
+    #  @ratings = Hash.new
+    #  @all_ratings.each do |rating|
+     #   @ratings[rating] = 1
+     # end
+   # end
 
     if @sort_by and @ratings
       @movies = Movie.where(:rating => @ratings.keys).order(@sort_by)
